@@ -2,10 +2,21 @@
 
 ## Summary
 
-Through this interface you can watch, add, update an delete data from your database tables.
-Also if, you login as superuser, you can modify user privileges to a table.
+Through this interface you interact with PostgreSQL.
+
+You can:
+* Login to database with different login
+* Select database
+* Select table in selected database
+* Insert new data
+* Update data
+* Delete data
+
+If you login as superuser, you can:
+
+* Grant and revoke privileges to users
+* Create new users
+* Delete users
 
 ## To-Do
-
-* User editor
 * Table editor

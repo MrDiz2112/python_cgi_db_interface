@@ -106,13 +106,48 @@ class Manager:
 
 
     @staticmethod
-    def sql_create_db(db_name):
+    def sql_create_user(login, password):
         cookie = Manager.cookie
-        connect_args = Manager.connect_args_tmp.format(cookie["database"].value,
+        connect_args = Manager.connect_args_tmp.format('postgres',
                                                        cookie["user"].value,
                                                        cookie["password"].value)
 
-        sql_command = "CREATE DATABASE {0};".format(db_name)
+        sql_command = "CREATE USER {0} WITH PASSWORD '{1}';".format(login, password)
+
+        with psycopg2.connect(connect_args) as connect:
+            with connect.cursor() as cursor:
+                cursor.execute(sql_command)
+                connect.commit()
+
+
+    @staticmethod
+    def sql_change_user_data(user, new_login, new_pass):
+        cookie = Manager.cookie
+        connect_args = Manager.connect_args_tmp.format('postgres',
+                                                       cookie["user"].value,
+                                                       cookie["password"].value)
+
+        only_pass = user == new_login
+
+        sql_new_login = "ALTER USER {0} RENAME TO {1};".format(user, new_login)
+        sql_new_pass = "ALTER USER {0} WITH PASSWORD '{1}';".format(user, new_pass)
+
+        with psycopg2.connect(connect_args) as connect:
+            with connect.cursor() as cursor:
+                cursor.execute(sql_new_pass)
+                if not only_pass:
+                    cursor.execute(sql_new_login)
+                connect.commit()
+
+
+    @staticmethod
+    def sql_drop_user(user):
+        cookie = Manager.cookie
+        connect_args = Manager.connect_args_tmp.format('postgres',
+                                                       cookie["user"].value,
+                                                       cookie["password"].value)
+
+        sql_command = "DROP USER {0};".format(user)
 
         with psycopg2.connect(connect_args) as connect:
             with connect.cursor() as cursor:
@@ -213,7 +248,6 @@ class Manager:
 
                     cursor.execute(sql_command)
                     connect.commit()
-
 
 
     @staticmethod
